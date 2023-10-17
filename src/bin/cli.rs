@@ -21,7 +21,7 @@ use yace::{
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
 struct Cli {
-    /// Symbol used for pixelss
+    /// Symbol used for pixels
     #[arg(short, long, default_value = "█")]
     symbol: char,
 
@@ -172,32 +172,25 @@ impl Cli {
     }
 
     fn draw_buffer(&self, buffer: &[u8], changes: &DisplayChange) -> Result<(), io::Error> {
-        let mut str_buffer = String::new();
         let x = changes.x as u16;
         let y = changes.y as u16;
+        let buffer = buffer
+            .into_iter()
+            .enumerate()
+            .map(|(i, &pixel)| {
+                let color = if pixel == 1 { &self.fg } else { &self.bg };
+                let fg = SetForegroundColor(color.to_color());
+                let end = if i % WIDTH == 0 { "\r\n" } else { "" };
 
-        for i in 0..HEIGHT {
-            for j in 0..WIDTH {
-                let pixel = buffer[i * WIDTH + j];
-                let color = match pixel == 1 {
-                    true => &self.fg,
-                    false => &self.bg,
-                };
-                let str = format!("{}{}", SetForegroundColor(color.to_color()), self.symbol);
-
-                str_buffer.push_str(&str);
-            }
-
-            str_buffer.push_str("\r\n");
-        }
-
-        str_buffer.pop();
+                format!("{}{}{}", fg, self.symbol, end)
+            })
+            .collect::<String>();
 
         stdout()
             .queue(cursor::MoveTo(x, y))?
             .queue(terminal::Clear(ClearType::FromCursorUp))?
             .queue(cursor::MoveTo(0, 0))?
-            .queue(style::Print(str_buffer))?
+            .queue(style::Print(buffer))?
             .flush()
     }
 
