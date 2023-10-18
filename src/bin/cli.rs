@@ -161,7 +161,8 @@ impl Cli {
             .map(|(i, &pixel)| {
                 let color = if pixel == 1 { &self.fg } else { &self.bg };
                 let fg = SetForegroundColor(color.to_color());
-                let end = if i % WIDTH == 0 { "\r\n" } else { "" };
+                let new_line = (i + 1) % WIDTH == 0 && (i + 1) != WIDTH * HEIGHT;
+                let end = if new_line { "\r\n" } else { "" };
 
                 format!("{}{}{}", fg, self.pixel, end)
             })
