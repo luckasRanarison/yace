@@ -22,7 +22,7 @@ use yace::{
 struct Cli {
     /// Symbol used for pixels
     #[arg(short, long, default_value = "█")]
-    symbol: char,
+    pixel: char,
 
     /// Foreground color
     #[arg(short, long, default_value = "green")]
@@ -33,8 +33,12 @@ struct Cli {
     bg: PixelColor,
 
     /// Clock speed
-    #[arg(short, long, default_value = "250")]
+    #[arg(short, long, default_value = "500")]
     clock: u64,
+
+    /// Steps per cycle
+    #[arg(short, long, default_value = "10")]
+    steps: u8,
 
     /// ROM file path
     path: String,
@@ -116,11 +120,19 @@ impl Cli {
     fn run(&self) -> Result<(), Error> {
         let bytes = fs::read(&self.path)?;
         let mut chip8 = Chip::new(&bytes);
+        let mut cycle_timer = 0;
 
         init_screen()?;
 
         loop {
             chip8.tick();
+
+            cycle_timer += 1;
+            cycle_timer %= self.steps;
+
+            if cycle_timer == 0 {
+                chip8.update_timers();
+            }
 
             if let Some(changes) = chip8.display.get_changes() {
                 let buffer = chip8.display.get_buffer();
@@ -151,7 +163,7 @@ impl Cli {
                 let fg = SetForegroundColor(color.to_color());
                 let end = if i % WIDTH == 0 { "\r\n" } else { "" };
 
-                format!("{}{}{}", fg, self.symbol, end)
+                format!("{}{}{}", fg, self.pixel, end)
             })
             .collect::<String>();
 

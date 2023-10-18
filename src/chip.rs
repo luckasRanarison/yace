@@ -55,7 +55,13 @@ impl Chip {
     pub fn tick(&mut self) {
         let instruction = self.fetch();
 
+        self.display.drop_changes();
         self.execute(instruction);
+    }
+
+    pub fn update_timers(&mut self) {
+        self.dt = self.dt.saturating_sub(1);
+        self.st = self.st.saturating_sub(1);
     }
 
     pub fn fetch(&self) -> u16 {
@@ -75,8 +81,6 @@ impl Chip {
 
         let nnn = opcode & 0x0FFF;
         let kk = (opcode & 0x00FF) as u8;
-
-        self.display.drop_changes();
 
         match nibbles {
             (0x0, 0x0, 0xE, 0x0) => self.cls(),
@@ -113,11 +117,10 @@ impl Chip {
             (0xF, x, 0x3, 0x3) => self.ld_b_vx(x),
             (0xF, x, 0x5, 0x5) => self.ld_i_vx(x),
             (0xF, x, 0x6, 0x5) => self.ld_vx_i(x),
-            _ => {}
+            _ => {
+                panic!("Unsupported instruction: {:x}", opcode);
+            }
         }
-
-        self.dt = self.dt.saturating_sub(1);
-        self.st = self.st.saturating_sub(1);
     }
 
     fn cls(&mut self) {
