@@ -38,6 +38,13 @@ impl Default for Chip {
 }
 
 impl Chip {
+    pub fn new(program: &[u8]) -> Self {
+        let mut chip = Chip::default();
+
+        chip.load(program);
+        chip
+    }
+
     pub fn load(&mut self, program: &[u8]) {
         let start = PRG_START as usize;
         let end = start + program.len();

@@ -8,9 +8,8 @@ use crossterm::{
 };
 use std::{
     fs,
-    io::{self, stdout, Write},
+    io::{stdout, Error, ErrorKind, Write},
     panic::{self, PanicInfo},
-    process,
     time::Duration,
 };
 use yace::{
@@ -114,13 +113,11 @@ impl KeyboardEvent {
 }
 
 impl Cli {
-    fn run(&self) -> Result<(), io::Error> {
+    fn run(&self) -> Result<(), Error> {
         let bytes = fs::read(&self.path)?;
-        let mut chip8 = Chip::default();
+        let mut chip8 = Chip::new(&bytes);
 
-        chip8.load(&bytes);
-
-        Self::init_screen()?;
+        init_screen()?;
 
         loop {
             chip8.tick();
@@ -140,38 +137,10 @@ impl Cli {
             }
         }
 
-        Self::cleanup()
+        cleanup()
     }
 
-    fn init_screen() -> Result<(), io::Error> {
-        let (width, height) = terminal::size()?;
-
-        if (width as usize) < WIDTH || (height as usize) < HEIGHT {
-            println!("The required terminal size is {}x{}", WIDTH, HEIGHT);
-            process::exit(0);
-        }
-
-        panic::set_hook(Box::new(|info: &PanicInfo| {
-            println!("{:?}", info);
-            Self::cleanup().unwrap();
-        }));
-
-        stdout()
-            .queue(terminal::EnterAlternateScreen)?
-            .queue(cursor::Hide)?;
-
-        terminal::enable_raw_mode()
-    }
-
-    fn cleanup() -> Result<(), io::Error> {
-        stdout()
-            .queue(terminal::LeaveAlternateScreen)?
-            .queue(cursor::Show)?;
-
-        terminal::disable_raw_mode()
-    }
-
-    fn draw_buffer(&self, buffer: &[u8], changes: &DisplayChange) -> Result<(), io::Error> {
+    fn draw_buffer(&self, buffer: &[u8], changes: &DisplayChange) -> Result<(), Error> {
         let x = changes.x as u16;
         let y = changes.y as u16;
         let buffer = buffer
@@ -194,7 +163,7 @@ impl Cli {
             .flush()
     }
 
-    fn read_key(&self) -> Result<Option<KeyboardEvent>, io::Error> {
+    fn read_key(&self) -> Result<Option<KeyboardEvent>, Error> {
         if event::poll(Duration::from_millis(1000 / self.clock))? {
             Ok(match event::read()? {
                 Event::Key(event) => KeyboardEvent::from_key_event(event),
@@ -204,6 +173,35 @@ impl Cli {
             Ok(None)
         }
     }
+}
+
+fn init_screen() -> Result<(), Error> {
+    let (width, height) = terminal::size()?;
+
+    if (width as usize) < WIDTH || (height as usize) < HEIGHT {
+        let message = format!("The required terminal size is {}x{}", WIDTH, HEIGHT);
+
+        return Err(Error::new(ErrorKind::Other, message));
+    }
+
+    panic::set_hook(Box::new(|info: &PanicInfo| {
+        println!("{:?}", info);
+        cleanup().unwrap();
+    }));
+
+    stdout()
+        .queue(terminal::EnterAlternateScreen)?
+        .queue(cursor::Hide)?;
+
+    terminal::enable_raw_mode()
+}
+
+fn cleanup() -> Result<(), Error> {
+    stdout()
+        .queue(terminal::LeaveAlternateScreen)?
+        .queue(cursor::Show)?;
+
+    terminal::disable_raw_mode()
 }
 
 fn main() {
