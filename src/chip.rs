@@ -185,7 +185,7 @@ impl Chip {
 
     fn ld_vx_k(&mut self, x: u8) {
         if let Some(key) = self.keyboard.get_pressed() {
-            self.write_register(x, key as u8);
+            self.write_register(x, key);
             self.increment();
         }
     }

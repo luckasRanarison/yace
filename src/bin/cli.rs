@@ -15,6 +15,7 @@ use std::{
 use yace::{
     chip::Chip,
     display::{DisplayChange, HEIGHT, WIDTH},
+    keyboard::Key,
 };
 
 #[derive(Parser)]
@@ -75,44 +76,44 @@ impl PixelColor {
 
 #[derive(Debug)]
 enum KeyboardEvent {
-    Press(u8),
-    Release(u8),
+    Press(Key),
+    Release,
     Exit,
 }
 
 impl KeyboardEvent {
     fn from_key_event(event: KeyEvent) -> Option<Self> {
-        match (event.modifiers, event.code) {
-            (KeyModifiers::CONTROL, KeyCode::Char('q') | KeyCode::Char('c')) => {
-                return Some(Self::Exit)
-            }
-            _ => {}
+        if let (KeyModifiers::CONTROL, KeyCode::Char('q') | KeyCode::Char('c')) =
+            (event.modifiers, event.code)
+        {
+            return Some(Self::Exit);
         }
 
-        let code = match event.code {
-            KeyCode::Char('1') => Some(0x1),
-            KeyCode::Char('2') => Some(0x2),
-            KeyCode::Char('3') => Some(0x3),
-            KeyCode::Char('4') => Some(0xC),
-            KeyCode::Char('q') => Some(0x4),
-            KeyCode::Char('w') => Some(0x5),
-            KeyCode::Char('e') => Some(0x6),
-            KeyCode::Char('r') => Some(0xD),
-            KeyCode::Char('a') => Some(0x7),
-            KeyCode::Char('s') => Some(0x8),
-            KeyCode::Char('d') => Some(0x9),
-            KeyCode::Char('f') => Some(0xE),
-            KeyCode::Char('z') => Some(0xA),
-            KeyCode::Char('x') => Some(0x0),
-            KeyCode::Char('c') => Some(0xB),
-            KeyCode::Char('v') => Some(0xF),
+        if event.kind == KeyEventKind::Release {
+            return Some(Self::Release);
+        }
+
+        let key = match event.code {
+            KeyCode::Char('1') => Some(Key::K1),
+            KeyCode::Char('2') => Some(Key::K2),
+            KeyCode::Char('3') => Some(Key::K3),
+            KeyCode::Char('4') => Some(Key::KC),
+            KeyCode::Char('q') => Some(Key::K4),
+            KeyCode::Char('w') => Some(Key::K5),
+            KeyCode::Char('e') => Some(Key::K6),
+            KeyCode::Char('r') => Some(Key::KD),
+            KeyCode::Char('a') => Some(Key::K7),
+            KeyCode::Char('s') => Some(Key::K8),
+            KeyCode::Char('d') => Some(Key::K9),
+            KeyCode::Char('f') => Some(Key::KE),
+            KeyCode::Char('z') => Some(Key::KA),
+            KeyCode::Char('x') => Some(Key::K0),
+            KeyCode::Char('c') => Some(Key::KB),
+            KeyCode::Char('v') => Some(Key::KF),
             _ => None,
         };
 
-        code.map(|code| match event.kind {
-            KeyEventKind::Release => Self::Release(code),
-            _ => Self::Press(code),
-        })
+        key.map(|key| Self::Press(key))
     }
 }
 
@@ -142,8 +143,8 @@ impl Cli {
 
             if let Some(event) = self.read_key()? {
                 match event {
-                    KeyboardEvent::Press(code) => chip8.keyboard.set_key(code),
-                    KeyboardEvent::Release(code) => chip8.keyboard.unset_key(code),
+                    KeyboardEvent::Press(key) => chip8.keyboard.set_key(key),
+                    KeyboardEvent::Release => chip8.keyboard.unset_key(),
                     KeyboardEvent::Exit => break,
                 }
             }
