@@ -61,7 +61,7 @@ impl WasmChip {
         self.chip.display.get_changes().map(DisplayChange::from)
     }
 
-    pub fn get_display_buffer(&self) -> *const u8 {
+    pub fn ptr_display_buffer(&self) -> *const u8 {
         self.chip.display.get_buffer().as_ptr()
     }
 
