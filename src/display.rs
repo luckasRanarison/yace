@@ -1,7 +1,10 @@
+use wasm_bindgen::prelude::wasm_bindgen;
+
 pub const WIDTH: usize = 64;
 pub const HEIGHT: usize = 32;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
+#[wasm_bindgen]
 pub struct DisplayChange {
     pub x: usize,
     pub y: usize,

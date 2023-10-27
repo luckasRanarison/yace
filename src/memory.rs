@@ -34,6 +34,10 @@ impl Default for Memory {
 }
 
 impl Memory {
+    pub fn clear(&mut self) {
+        self.memory = [0; MEM_SIZE];
+    }
+
     pub fn read(&self, addr: u16) -> u8 {
         self.memory[addr as usize]
     }
