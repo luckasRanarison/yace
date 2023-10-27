@@ -1,0 +1,66 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  color: #fff;
+  font-family: "Press Start 2P";
+  font-size: 14px;
+  line-height: 30px;
+}
+
+nav {
+  width: 100%;
+  padding: 1.5rem 2.5rem;
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+#github-icon {
+  width: 25px;
+  stroke: #fff;
+}
+
+body {
+  min-width: 100vw;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #000;
+}
+
+#container {
+  margin: 1rem;
+  max-width: 700px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+p {
+  text-align: center;
+}
+
+#rom-container {
+  margin: 3rem 0;
+  display: flex;
+}
+
+#rom-container select {
+  margin-right: 1rem;
+}
+
+#rom-container button,
+select {
+  background: none;
+  padding: 0.5em 1em;
+  border: 3px solid #fff;
+  border-radius: 2px;
+}
+
+#canvas {
+  width: fit-content;
+  height: fit-content;
+  image-rendering: pixelated;
+}

@@ -1,23 +1,5 @@
-use crate::{chip::Chip, display, keyboard::Key};
+use crate::{chip::Chip, keyboard::Key};
 use wasm_bindgen::prelude::wasm_bindgen;
-
-#[derive(Debug, Clone)]
-#[wasm_bindgen]
-pub struct DisplayChange {
-    pub x: usize,
-    pub y: usize,
-    pub n: usize,
-}
-
-impl From<&display::DisplayChange> for DisplayChange {
-    fn from(value: &display::DisplayChange) -> Self {
-        Self {
-            x: value.x,
-            y: value.y,
-            n: value.n,
-        }
-    }
-}
 
 #[wasm_bindgen]
 pub struct WasmChip {
@@ -57,8 +39,8 @@ impl WasmChip {
         self.chip.update_timers();
     }
 
-    pub fn get_display_changes(&self) -> Option<DisplayChange> {
-        self.chip.display.get_changes().map(DisplayChange::from)
+    pub fn has_display_changes(&self) -> bool {
+        self.chip.display.get_changes().is_some()
     }
 
     pub fn ptr_display_buffer(&self) -> *const u8 {
@@ -73,5 +55,9 @@ impl WasmChip {
 
     pub fn unset_key(&mut self) {
         self.chip.keyboard.unset_key();
+    }
+
+    pub fn get_key(&self) -> Option<u8> {
+        self.chip.keyboard.get_pressed()
     }
 }
