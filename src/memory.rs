@@ -34,6 +34,10 @@ impl Default for Memory {
 }
 
 impl Memory {
+    pub fn clear(&mut self) {
+        self.memory[FONTS.len()..].fill(0);
+    }
+
     pub fn read(&self, addr: u16) -> u8 {
         self.memory[addr as usize]
     }

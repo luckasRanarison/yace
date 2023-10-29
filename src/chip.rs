@@ -45,6 +45,19 @@ impl Chip {
         chip
     }
 
+    pub fn reset(&mut self) {
+        self.v = [0; 16];
+        self.i = 0;
+        self.dt = 0;
+        self.st = 0;
+        self.pc = PRG_START;
+        self.sp = 0;
+        self.stack = [0; 16];
+        self.memory.clear();
+        self.keyboard.reset();
+        self.display.clear();
+    }
+
     pub fn load(&mut self, program: &[u8]) {
         let start = PRG_START as usize;
         let end = start + program.len();
@@ -55,7 +68,7 @@ impl Chip {
     pub fn tick(&mut self) {
         let instruction = self.fetch();
 
-        self.display.drop_changes();
+        self.display.clear_status();
         self.execute(instruction);
     }
 
