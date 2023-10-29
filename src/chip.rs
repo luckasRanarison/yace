@@ -54,7 +54,7 @@ impl Chip {
         self.sp = 0;
         self.stack = [0; 16];
         self.memory.clear();
-        self.keyboard.unset_key();
+        self.keyboard.reset();
         self.display.clear();
     }
 
@@ -68,7 +68,7 @@ impl Chip {
     pub fn tick(&mut self) {
         let instruction = self.fetch();
 
-        self.display.drop_changes();
+        self.display.clear_status();
         self.execute(instruction);
     }
 

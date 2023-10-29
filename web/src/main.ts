@@ -112,8 +112,8 @@ const init = () => {
 
   document.addEventListener("keyup", (event) => {
     const key = KEYMAP[event.code];
-    if (key === chip.get_key()) {
-      chip.unset_key();
+    if (key) {
+      chip.unset_key(key);
     }
   });
 };

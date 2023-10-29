@@ -1,7 +1,10 @@
 use clap::{arg, command, Parser, ValueEnum};
 use crossterm::{
     cursor,
-    event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers},
+    event::{
+        self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers,
+        KeyboardEnhancementFlags as KeyFlag, PushKeyboardEnhancementFlags as PushKeyFlag,
+    },
     style::{self, Color, SetForegroundColor},
     terminal::{self, ClearType},
     QueueableCommand,
@@ -14,8 +17,7 @@ use std::{
 };
 use yace::{
     chip::Chip,
-    display::{DisplayChange, HEIGHT, WIDTH},
-    keyboard::Key,
+    display::{HEIGHT, WIDTH},
 };
 
 #[derive(Parser)]
@@ -76,8 +78,8 @@ impl PixelColor {
 
 #[derive(Debug)]
 enum KeyboardEvent {
-    Press(Key),
-    Release,
+    Press(u8),
+    Release(u8),
     Exit,
 }
 
@@ -89,31 +91,30 @@ impl KeyboardEvent {
             return Some(Self::Exit);
         }
 
-        if event.kind == KeyEventKind::Release {
-            return Some(Self::Release);
-        }
-
         let key = match event.code {
-            KeyCode::Char('1') => Some(Key::K1),
-            KeyCode::Char('2') => Some(Key::K2),
-            KeyCode::Char('3') => Some(Key::K3),
-            KeyCode::Char('4') => Some(Key::KC),
-            KeyCode::Char('q') => Some(Key::K4),
-            KeyCode::Char('w') => Some(Key::K5),
-            KeyCode::Char('e') => Some(Key::K6),
-            KeyCode::Char('r') => Some(Key::KD),
-            KeyCode::Char('a') => Some(Key::K7),
-            KeyCode::Char('s') => Some(Key::K8),
-            KeyCode::Char('d') => Some(Key::K9),
-            KeyCode::Char('f') => Some(Key::KE),
-            KeyCode::Char('z') => Some(Key::KA),
-            KeyCode::Char('x') => Some(Key::K0),
-            KeyCode::Char('c') => Some(Key::KB),
-            KeyCode::Char('v') => Some(Key::KF),
+            KeyCode::Char('1') => Some(0x1),
+            KeyCode::Char('2') => Some(0x2),
+            KeyCode::Char('3') => Some(0x3),
+            KeyCode::Char('4') => Some(0xC),
+            KeyCode::Char('q') => Some(0x4),
+            KeyCode::Char('w') => Some(0x5),
+            KeyCode::Char('e') => Some(0x6),
+            KeyCode::Char('r') => Some(0xD),
+            KeyCode::Char('a') => Some(0x7),
+            KeyCode::Char('s') => Some(0x8),
+            KeyCode::Char('d') => Some(0x9),
+            KeyCode::Char('f') => Some(0xE),
+            KeyCode::Char('z') => Some(0xA),
+            KeyCode::Char('x') => Some(0x0),
+            KeyCode::Char('c') => Some(0xB),
+            KeyCode::Char('v') => Some(0xF),
             _ => None,
         };
 
-        key.map(|key| Self::Press(key))
+        key.map(|key| match event.kind {
+            KeyEventKind::Release => Self::Release(key),
+            _ => Self::Press(key),
+        })
     }
 }
 
@@ -135,16 +136,15 @@ impl Cli {
                 chip8.update_timers();
             }
 
-            if let Some(changes) = chip8.display.get_changes() {
+            if chip8.display.has_changed() {
                 let buffer = chip8.display.get_buffer();
-
-                self.draw_buffer(buffer, changes)?;
+                self.draw_buffer(buffer)?;
             }
 
             if let Some(event) = self.read_key()? {
                 match event {
                     KeyboardEvent::Press(key) => chip8.keyboard.set_key(key),
-                    KeyboardEvent::Release => chip8.keyboard.unset_key(),
+                    KeyboardEvent::Release(key) => chip8.keyboard.unset_key(key),
                     KeyboardEvent::Exit => break,
                 }
             }
@@ -153,9 +153,7 @@ impl Cli {
         cleanup()
     }
 
-    fn draw_buffer(&self, buffer: &[u8], changes: &DisplayChange) -> Result<(), Error> {
-        let x = changes.x as u16;
-        let y = changes.y as u16;
+    fn draw_buffer(&self, buffer: &[u8]) -> Result<(), Error> {
         let buffer = buffer
             .into_iter()
             .enumerate()
@@ -170,8 +168,7 @@ impl Cli {
             .collect::<String>();
 
         stdout()
-            .queue(cursor::MoveTo(x, y))?
-            .queue(terminal::Clear(ClearType::FromCursorUp))?
+            .queue(terminal::Clear(ClearType::All))?
             .queue(cursor::MoveTo(0, 0))?
             .queue(style::Print(buffer))?
             .flush()
@@ -204,6 +201,9 @@ fn init_screen() -> Result<(), Error> {
     }));
 
     stdout()
+        .queue(PushKeyFlag(KeyFlag::REPORT_EVENT_TYPES))?
+        .queue(PushKeyFlag(KeyFlag::REPORT_ALL_KEYS_AS_ESCAPE_CODES))?
+        .queue(PushKeyFlag(KeyFlag::DISAMBIGUATE_ESCAPE_CODES))?
         .queue(terminal::EnterAlternateScreen)?
         .queue(cursor::Hide)?;
 
@@ -212,6 +212,9 @@ fn init_screen() -> Result<(), Error> {
 
 fn cleanup() -> Result<(), Error> {
     stdout()
+        .queue(event::PopKeyboardEnhancementFlags)?
+        .queue(event::PopKeyboardEnhancementFlags)?
+        .queue(event::PopKeyboardEnhancementFlags)?
         .queue(terminal::LeaveAlternateScreen)?
         .queue(cursor::Show)?;
 

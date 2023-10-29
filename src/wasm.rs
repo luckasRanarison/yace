@@ -1,4 +1,4 @@
-use crate::{chip::Chip, keyboard::Key};
+use crate::chip::Chip;
 use wasm_bindgen::prelude::wasm_bindgen;
 
 #[wasm_bindgen]
@@ -40,7 +40,7 @@ impl WasmChip {
     }
 
     pub fn has_display_changes(&self) -> bool {
-        self.chip.display.get_changes().is_some()
+        self.chip.display.has_changed()
     }
 
     pub fn ptr_display_buffer(&self) -> *const u8 {
@@ -48,13 +48,11 @@ impl WasmChip {
     }
 
     pub fn set_key(&mut self, key: u8) {
-        if let Some(key) = Key::from_u8(key) {
-            self.chip.keyboard.set_key(key);
-        }
+        self.chip.keyboard.set_key(key);
     }
 
-    pub fn unset_key(&mut self) {
-        self.chip.keyboard.unset_key();
+    pub fn unset_key(&mut self, key: u8) {
+        self.chip.keyboard.unset_key(key);
     }
 
     pub fn get_key(&self) -> Option<u8> {

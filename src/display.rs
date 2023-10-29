@@ -1,24 +1,17 @@
 pub const WIDTH: usize = 64;
 pub const HEIGHT: usize = 32;
 
-#[derive(Debug, Clone)]
-pub struct DisplayChange {
-    pub x: usize,
-    pub y: usize,
-    pub n: usize,
-}
-
 #[derive(Debug)]
 pub struct Display {
     buffer: [u8; WIDTH * HEIGHT],
-    changes: Option<DisplayChange>,
+    updated: bool,
 }
 
 impl Default for Display {
     fn default() -> Self {
         Self {
             buffer: [0; WIDTH * HEIGHT],
-            changes: None,
+            updated: false,
         }
     }
 }
@@ -26,7 +19,6 @@ impl Default for Display {
 impl Display {
     pub fn load_sprite(&mut self, x: usize, y: usize, sprite: &[u8]) -> bool {
         let mut collision = false;
-        let n = sprite.len();
 
         for (i, row) in sprite.iter().enumerate() {
             for offset in 0..8 {
@@ -44,7 +36,7 @@ impl Display {
             }
         }
 
-        self.changes = Some(DisplayChange { x, y, n });
+        self.updated = true;
 
         collision
     }
@@ -57,11 +49,11 @@ impl Display {
         &self.buffer
     }
 
-    pub fn get_changes(&self) -> Option<&DisplayChange> {
-        self.changes.as_ref()
+    pub fn has_changed(&self) -> bool {
+        self.updated
     }
 
-    pub fn drop_changes(&mut self) {
-        self.changes.take();
+    pub fn clear_status(&mut self) {
+        self.updated = false
     }
 }
