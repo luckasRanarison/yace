@@ -4,21 +4,37 @@
   box-sizing: border-box;
   color: #fff;
   font-family: "Press Start 2P";
-  font-size: 14px;
+  font-size: 13px;
   line-height: 30px;
 }
 
 nav {
+  position: sticky;
+  top: 0;
   width: 100%;
   padding: 1.5rem 2.5rem;
-  margin-bottom: 2rem;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  background-color: #000;
+}
+
+nav a {
+  display: flex;
+}
+
+#title-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+#title-container img {
+  width: 25px;
 }
 
 #github-icon {
   width: 25px;
-  stroke: #fff;
 }
 
 body {
@@ -31,11 +47,12 @@ body {
 }
 
 #container {
-  margin: 1rem;
+  margin: 2.5rem;
   max-width: 700px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 3rem;
 }
 
 p {
@@ -43,7 +60,6 @@ p {
 }
 
 #rom-container {
-  margin: 3rem 0;
   display: flex;
 }
 
@@ -56,11 +72,68 @@ select {
   background: none;
   padding: 0.5em 1em;
   border: 3px solid #fff;
-  border-radius: 2px;
+}
+
+#rom-container button:hover {
+  background-color: #fff;
+  color: #000;
+}
+
+#game-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+#table-key {
+  border-collapse: collapse;
+  border: 3px solid #fff;
+}
+
+#table-key td {
+  padding: 0.3em 1em;
+  border: 3px solid #fff;
+}
+
+.key-pressed {
+  background-color: #fff;
+  color: #000;
 }
 
 #canvas {
-  width: fit-content;
+  width: 100%;
   height: fit-content;
   image-rendering: pixelated;
+  border: 3px solid #fff;
+}
+
+#link-issue {
+  text-decoration-thickness: 2px;
+}
+
+#github-status a {
+  text-decoration: none;
+}
+
+footer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5em;
+  font-size: 10px;
+  text-align: center;
+}
+
+footer img {
+  width: 20px;
+}
+
+@media screen and (max-width: 700px) {
+  * {
+    font-size: 12px;
+  }
+
+  #game-container {
+    flex-direction: column;
+    gap: 3rem;
+  }
 }
