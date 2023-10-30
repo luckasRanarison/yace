@@ -14,4 +14,4 @@ Yet another CHIP-8 emulator.
 
 - [x] CLI version.
 
-- [ ] WASM and webui.
+- [x] WASM and webui.
