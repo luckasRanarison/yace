@@ -1,0 +1,22 @@
+{
+  "name": "yace-web",
+  "private": true,
+  "author": "LIOKA Ranarison Fiderana",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "cd .. && wasm-pack build --features='wasm' --out-dir web/pkg && cd web && tsc && vite build",
+    "preview": "vite preview --host"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.2",
+    "vite": "^4.4.5",
+    "vite-plugin-top-level-await": "^1.3.1",
+    "vite-plugin-wasm": "^3.2.2",
+    "wasm-pack": "^0.12.1"
+  },
+  "dependencies": {
+    "yace": "file:pkg"
+  }
+}

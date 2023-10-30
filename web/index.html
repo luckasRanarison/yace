@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Press Start 2P"
+      rel="stylesheet"
+    />
+    <title>Yace</title>
+  </head>
+
+  <body>
+    <nav>
+      <span id="title-container">
+        <img src="/src/assets/gamepad.svg" alt="logo" />
+        <span>YACE</span>
+      </span>
+      <a href="https://github.com/luckasRanarison/yace">
+        <img src="/src/assets/github.svg" alt="github" id="github-icon" />
+      </a>
+    </nav>
+    <div id="container">
+      <p>
+        Yet another CHIP-8 emulator written in Rust and powered by Web Assembly.
+      </p>
+      <div id="rom-container">
+        <select id="select-rom">
+          <option value="" selected disabled>Select a ROM</option>
+        </select>
+        <button id="btn-start">START</button>
+      </div>
+      <div id="game-container">
+        <canvas id="canvas"></canvas>
+        <table id="table-key">
+          <tr>
+            <td id="key-1" data-key="0x1">1</td>
+            <td id="key-2" data-key="0x2">2</td>
+            <td id="key-3" data-key="0x3">3</td>
+            <td id="key-12" data-key="0xc">4</td>
+          </tr>
+          <tr>
+            <td id="key-4" data-key="0x4">Q</td>
+            <td id="key-5" data-key="0x5">W</td>
+            <td id="key-6" data-key="0x6">E</td>
+            <td id="key-13" data-key="0xd">R</td>
+          </tr>
+          <tr>
+            <td id="key-7" data-key="0x7">A</td>
+            <td id="key-8" data-key="0x8">S</td>
+            <td id="key-9" data-key="0x9">D</td>
+            <td id="key-14" data-key="0xe">F</td>
+          </tr>
+          <tr>
+            <td id="key-10" data-key="0xa">Z</td>
+            <td id="key-0" data-key="0x0">X</td>
+            <td id="key-11" data-key="0xb">C</td>
+            <td id="key-15" data-key="0xf">V</td>
+          </tr>
+        </table>
+      </div>
+      <footer>
+        <div>
+          Found a bug? Report it
+          <a
+            id="link-issue"
+            href="https://github.com/luckasRanarison/yace/issues/new"
+            >here</a
+          >.
+        </div>
+        <div id="github-status">
+          <a href="https://github.com/luckasRanarison/yace/stargazers">
+            <img src="/src/assets/star.svg" />
+            <span id="status-star"></span>
+          </a>
+          <a href="https://github.com/luckasRanarison/yace/forks">
+            <img src="/src/assets/fork.svg" />
+            <span id="status-fork"></span>
+          </a>
+          <a href="https://github.com/luckasRanarison/yace/watchers">
+            <img src="/src/assets/eye.svg" />
+            <span id="status-watcher"></span>
+          </a>
+        </div>
+      </footer>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
