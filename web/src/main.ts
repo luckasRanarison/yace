@@ -77,7 +77,7 @@ const loop = () => {
 };
 
 const getRom = async (name: string) => {
-  const rom = await fetch(`/roms/${name}`);
+  const rom = await fetch(`/yace/roms/${name}`);
   const buf = await rom.arrayBuffer();
   const bytes = new Uint8Array(buf);
 
