@@ -164,8 +164,8 @@ const fetchRepoData = async () => {
   const forkElem = document.getElementById("status-fork") as HTMLElement;
 
   starElem.innerText = parsed.stargazers_count;
-  watcherElem.innerText = parsed.forks_count;
-  forkElem.innerText = parsed.watchers_count;
+  forkElem.innerText = parsed.forks_count;
+  watcherElem.innerText = parsed.watchers_count;
 };
 
 init();
